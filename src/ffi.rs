@@ -17,14 +17,14 @@ pub enum ParserType {
 #[repr(C)]
 pub struct HttpParser {
     // Private Interface
-    _internal_state: libc::uint32_t,
-    _nread: libc::uint32_t,
-    _content_length: libc::uint64_t,
+    _internal_state: u32,
+    _nread: u32,
+    _content_length: u64,
 
     // Read-Only
     pub http_major: libc::c_ushort,
     pub http_minor: libc::c_ushort,
-    pub _extended_status: libc::uint32_t,
+    pub _extended_status: u32,
 
     // Public Interface
     pub data: *mut libc::c_void
@@ -34,7 +34,7 @@ unsafe impl Send for HttpParser { }
 
 impl HttpParser {
     pub fn new(parser_type: ParserType) -> HttpParser {
-        let mut p: HttpParser = unsafe { mem::uninitialized() };
+        let mut p: HttpParser = unsafe { mem::MaybeUninit::uninit().assume_init() };
         unsafe { http_parser_init(&mut p as *mut _, parser_type); }
         return p;
     }
